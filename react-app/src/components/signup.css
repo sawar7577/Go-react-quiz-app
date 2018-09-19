@@ -1,0 +1,24 @@
+.signup {
+  text-align: center;
+}
+
+.signup-header {
+  background-color: #222;
+  height: 70px;
+  padding: 5px;
+  color: white;
+}
+
+.signup-title {
+  font-size: 1.5em;
+}
+
+.signup-intro {
+  font-size: large;
+}
+
+.formContainer {
+  padding-left: 500px;
+  padding-right: 500px;
+
+}

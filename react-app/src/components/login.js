@@ -16,19 +16,18 @@ class login extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         };
         handleSubmit (event) {
-            if (this.state.validUsername == true ){
               event.preventDefault();
                 fetch('http://localhost:8080/person/authenticate', {
                       method: 'POST',
+                      credentials: 'include',
                       body: JSON.stringify(this.state.formData),
                     })
                   .then(response => {
                     if(response.status >= 200 && response.status < 300){
+                        console.log("true")
                         this.setState({authentication: true});
-                        
                     }
                   });
-            }
           }
     
           handleUChange(event) {
@@ -50,9 +49,20 @@ class login extends Component {
                             <label>Password</label>
                             <input type = "text" className = "form-control" value = {this.state.Password} onChange = {this.handlePChange}/>
                         </div>
+                        <button type="submit" className="btn btn-default">Submit</button>
                     </form>
                 </div>
+                {this.state.authentication &&
+                    <div>
+                        <h2>
+                        User verified.
+                        </h2>
+                        This has been printed using conditional rendering.
+                    </div>
+                    }
             </div>
         );
     }
 }
+
+export default login

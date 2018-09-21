@@ -1,12 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
+	"net/http"
 	"time"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
+	"github.com/rs/cors"
+
+	// "github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -23,20 +29,23 @@ type Person struct {
 }
 
 type Quiz struct {
-	ID        uint `gorm:"primary_key" json:"id"`
-	Questions []Question
+	ID    uint   `gorm:"primary_key" json:"id"`
+	Name  string `json:"name"`
+	Genre string `json:"genre"`
+	Type  string `json:"type"`
 }
 
 type Question struct {
-	ID      uint   `gorm:"primary_key" json:"id"`
-	Ques    string `json:"ques"`
-	Options []Option
+	ID     uint   `gorm:"primary_key" json:"id"`
+	Ques   string `json:"ques"`
+	Quizid string `json:"quizid"`
 }
 
 type Option struct {
-	ID     uint `gorm:"primary_key" json:"id"`
-	option string
-	val    bool
+	ID         uint   `gorm:"primary_key" json:"id"`
+	option     string `json:"option"`
+	QuestionId string `json:"questionid"`
+	val        bool   `json:"val"`
 }
 
 func init() {
@@ -66,6 +75,8 @@ func giveSeq() string {
 	return id
 }
 
+var store = sessions.NewCookieStore([]byte("secret-password"))
+
 func main() {
 	db, err = gorm.Open("sqlite3", "./gorm.db")
 	if err != nil {
@@ -76,18 +87,33 @@ func main() {
 	db.AutoMigrate(&Quiz{})
 	db.AutoMigrate(&Question{})
 	db.AutoMigrate(&Option{})
+	fmt.Println("server started")
+	r := mux.NewRouter()
 
-	r := gin.Default()
-	r.POST("/person", CreatePerson)
-	r.POST("/person/", CheckUsername)
-	r.POST("/person/authenticate", PersonAuthenticate)
-	r.Use((cors.Default()))
-	r.Run(":8080") // Run on port 8080
+	r.HandleFunc("/person", CreatePerson).Methods("POST")
+	r.HandleFunc("/person/authenticate", PersonAuthenticate).Methods("POST")
+	r.HandleFunc("/person/", CheckUsername).Methods("POST")
+	r.HandleFunc("/logged",IsLoggedIn).Methods("POST")
+	private := r.PathPrefix("/private").Subrouter()
+	private.Use(AuthMiddleware)
+	private.HandleFunc("/quiz", CreateQuiz)
+	handler := cors.Default().Handler(r)
+	c := cors.New(cors.Options{
+		// AllowedOrigins: []string{"http://foo.com", "http://foo.com:8080"},
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		// Enable Debugging for testing, consider disabling in production
+		Debug: true,
+	})
+	handler = c.Handler(handler)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
 
-func CheckUsername(c *gin.Context) {
+func CheckUsername(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
 	var person Person
-	c.BindJSON(&person)
+	decoder.Decode(&person)
+
 	db, err = gorm.Open("sqlite3", "./gorm.db")
 	if err != nil {
 		fmt.Println(err)
@@ -96,43 +122,104 @@ func CheckUsername(c *gin.Context) {
 	var count int
 	db.Where("user_name = ?", person.UserName).Find(&check).Count(&count)
 	if count != 0 {
-		c.Header("access-control-allow-origin", "*")
-		c.JSON(200, false)
+		respondJSON(w, http.StatusOK, false)
 	} else {
-		c.Header("access-control-allow-origin", "*")
-		c.JSON(200, true)
+		respondJSON(w, http.StatusOK, true)
 	}
 	db.Close()
 }
 
-func CreatePerson(c *gin.Context) {
+func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
+	response, err := json.Marshal(payload)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write([]byte(response))
+}
+
+func CreatePerson(w http.ResponseWriter, r *http.Request) {
 	db, err = gorm.Open("sqlite3", "./gorm.db")
 	if err != nil {
 		fmt.Println(err)
 	}
+	decoder := json.NewDecoder(r.Body)
 	var person Person
-	c.BindJSON(&person)
+	decoder.Decode(&person)
 	person.ID = giveSeq()
 	db.Create(&person)
-	c.Header("access-control-allow-origin", "*")
-	c.JSON(200, person)
+	respondJSON(w, http.StatusOK, person)
 	db.Close()
 }
 
-func PersonAuthenticate(c *gin.Context) {
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, err := store.Get(r, "session-name")
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(session.Values["user"])
+		if session.Values["user"] == nil {
+			respondJSON(w, 404, "authentication-required")
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func IsLoggedIn(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(session.Values["user"])
+	if session.Values["user"] == nil {
+		respondJSON(w, 404, false)
+	} else {
+		respondJSON(w, 200, true)
+	}
+}
+
+func CreateQuiz(w http.ResponseWriter, r *http.Request) {
 	db, err = gorm.Open("sqlite3", "./gorm.db")
 	if err != nil {
 		fmt.Println(err)
 	}
+	var quiz Quiz
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&quiz)
+	db.Create(&quiz)
+	respondJSON(w, http.StatusOK, quiz)
+	db.Close()
+}
+
+func PersonAuthenticate(w http.ResponseWriter, r *http.Request) {
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	decoder := json.NewDecoder(r.Body)
 	var person Person
-	c.BindJSON(&person)
+	decoder.Decode(&person)
 	var check []Person
 	var count int
-	db.Where("user_name = ? AND password = ?", person.UserName,person.Password).Find(&check).Count(&count)
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		fmt.Println(err)
+	}
+	db.Where("user_name = ? AND password = ?", person.UserName, person.Password).Find(&check).Count(&count)
+
 	if count == 1 {
-		c.JSON(200, check)
+		session.Values["user"] = person.UserName
+		session.Save(r, w)
+		fmt.Println(session.Values["user"])
+		respondJSON(w, http.StatusOK, person)
+
 	} else {
-		c.JSON(404, check)
+		respondJSON(w, 404, person)
 	}
 	db.Close()
 }

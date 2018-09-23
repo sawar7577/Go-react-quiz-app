@@ -26,8 +26,12 @@ class signup extends Component {
         if (this.state.validUsername == true ){
           event.preventDefault();
             fetch('http://localhost:8080/person', {
-                  method: 'POST',
-                  body: JSON.stringify(this.state.formData),
+              method: 'POST',
+              header: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify(this.state.formData),
                 })
               .then(response => {
                 if(response.status >= 200 && response.status < 300)
@@ -49,6 +53,10 @@ class signup extends Component {
         fetch(request, {
           method : 'POST',
           body: JSON.stringify(this.state.formData),
+          header: {
+            'content-Type': 'application/json',
+        },
+          credentials : 'include',
         })
         .then(response => response.json())
           .then(data => this.setState({validUsername: data}));

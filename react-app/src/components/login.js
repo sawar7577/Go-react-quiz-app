@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM, { render } from 'react-dom';
-
+// import { browserHistory } from 'react-router-dom';
+import history from './history';
 class login extends Component {
     constructor() {
         super();
@@ -19,6 +20,9 @@ class login extends Component {
               event.preventDefault();
                 fetch('http://localhost:8080/person/authenticate', {
                       method: 'POST',
+                      header: {
+                        'Content-Type': 'application/json',
+                      },
                       credentials: 'include',
                       body: JSON.stringify(this.state.formData),
                     })
@@ -26,6 +30,7 @@ class login extends Component {
                     if(response.status >= 200 && response.status < 300){
                         console.log("true")
                         this.setState({authentication: true});
+                        this.onNavigationHome();
                     }
                   });
           }
@@ -36,6 +41,10 @@ class login extends Component {
           handlePChange(event) {
             this.state.formData.Password = event.target.value;
           }
+
+        onNavigationHome () {
+            history.push("/");
+        }
     render() {
         return (
             <div className = "login">

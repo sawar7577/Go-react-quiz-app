@@ -6,7 +6,11 @@ import React, { Component } from 'react';
 // import Home from './Home';
 import signup from './signup';
 import login from './login';
-import createquiz from './createquiz'
+import createquiz from './createquiz';
+import viewquiz from './viewquiz';
+import ViewPeople from './viewpeople';
+import quizedit from './quizedit';
+import logout from './logout' 
 
 
 
@@ -16,16 +20,32 @@ class App extends Component {
   constructor () {
     super();
     this.state = {
-      loggedIn : false,
+      authentication : false,
     };
   };
-  window.onbeforeunload = (e) => {
-    console.log(e);
-    return 'Stop this event';
-  };
+  componentDidMount() {
+    console.log("logged")
+    // fetch('http://localhost:8080/logged', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type' : 'application/json',
+    //     },
+    //     credentials: 'include',
+    //     body: JSON.stringify(this.state.formData),
+    //     })
+    //       .then(response => {
+    //         if(response.status >= 200 && response.status < 300){
+    //                     console.log("true")
+    //                     this.setState({authentication: true});
+    //         } else {
+    //           this.setState({authentication: false});
+    //         }
+    //   });
+      console.log("after")
+  }
   render() {
     return (
-      <div>
+      // <div>
         <Router>
           <div>
             <nav className="navbar navbar-default">
@@ -33,34 +53,33 @@ class App extends Component {
                 <div className="navbar-header">
                   <Link className="navbar-brand" to={'/'}>React App</Link>
                 </div>
-                <ul className="nav navbar-nav">
-                  {/* <li><Link to={'/'}>Home</Link></li> */}
-                  {/* <li><Link to={'/NewPerson'}>Create Person</Link></li>
-                  <li><Link to={'/EditPerson'}>Edit Person</Link></li>
-                  <li><Link to={'/DeletePerson'}>Delete Person</Link></li>
-                  <li><Link to={'/ViewPeople'}>View People</Link></li> */}
-                  <li><Link to={'/signup'}>Sign Up</Link></li>
-                  <li><Link to={'/login'}>Login</Link></li>
-                  <li><Link to={'/createquiz'}>Create Quiz</Link></li>
+                    <ul className="nav navbar-nav">
+                    <li><Link to={'/signup'}>Sign Up</Link></li>
+                    <li><Link to={'/login'}>Login</Link></li>
 
-
-                </ul>
+                    <li><Link to={'/createquiz'}>Create Quiz</Link></li>
+                    <li><Link to={'/viewquiz'}>View Quiz</Link></li>
+                    <li><Link to={'/viewpeople'}>View People</Link></li>
+                    <li><Link to={'/logout'}>Logout</Link></li>
+                    <li><Link to={'/dashboard'}>Dashboard</Link></li>
+                    </ul>
               </div>
             </nav>
             <Switch>
-                 {/* <Route exact path='/' component={Home} /> */}
-                 {/* <Route exact path='/NewPerson' component={NewPerson} />
-                 <Route exact path='/EditPerson' component={EditPerson} />
-                 <Route exact path='/DeletePerson' component={DeletePerson} />
-                 <Route exact path='/ViewPeople' component={ViewPeople} /> */}
+                 
                 <Route exact path='/signup' component={signup}/>
                 <Route exact path='/login' component={login}/>
                 <Route exact path='/createquiz' component={createquiz}/>
-
+                <Route exact path='/viewquiz' component={viewquiz}/>
+                <Route exact path='/viewpeople' component={ViewPeople}/>
+                <Route exact path='/quizedit/:id' component={quizedit}/>
+                <Route exact path='/logout' component={logout}/>
+                <Route exact path='/dashboard' component={dashboard}/>
+                
             </Switch>
           </div>
         </Router>
-      </div>
+      // </div>
     );
   }
 }

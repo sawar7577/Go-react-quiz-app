@@ -109,9 +109,10 @@ func main() {
 	private.POST("/delquiz/", DeleteQuiz)
 	private.POST("/quiz", CreateQuiz)
 	private.POST("/ques", CreateQues)
-	private.POST("/quizzes/", ViewQuizzes)
+	private.GET("/quizzes/", ViewQuizzes)
 	private.POST("/delques", DeleteQues)
 	private.POST("/viewques/", ViewQues)
+	private.POST("/delperson/", DeletePerson)
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:8080"}
 	r.Use((cors.New(config)))
@@ -153,16 +154,38 @@ func CheckUsername(c *gin.Context) {
 	}
 	db.Close()
 }
+
+func DeletePerson(c *gin.Context) {
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	var person Person
+
+	body, err := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(err)
+	json.Unmarshal(body, &person)
+	fmt.Println("id===", person.ID)
+
+	var person2 Person
+	db.Where("id = ?", person.ID).Delete(&person2)
+
+	c.Header("Content-Type", "application/json")
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+
+	c.JSON(200, true)
+
+	db.Close()
+}
+
 func DeleteQuiz(c *gin.Context) {
 	fmt.Println("delete quiz called")
 	db, err = gorm.Open("sqlite3", "./gorm.db")
 	var quiz Quiz
-	// var ques Question
+
 	body, err := ioutil.ReadAll(c.Request.Body)
 	fmt.Println(err)
 	json.Unmarshal(body, &quiz)
 	fmt.Println("id===", quiz.ID)
-	// db.Where("quizid = ?", quiz.ID).Delete(ques)
+
 	var quiz2 Quiz
 	db.Where("id = ?", quiz.ID).Delete(&quiz2)
 

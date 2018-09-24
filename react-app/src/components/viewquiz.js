@@ -8,13 +8,12 @@ class viewquiz extends Component {
     this.state = {
       data: []
     }
-    // this.EditRow = this.EditRow.bind(this)
-  }
+  };
 
     componentDidMount() {
     const request = new Request('http://localhost:8080/private/quizzes/');
     fetch(request, {
-      method: 'POST',
+      method: 'GET',
       header: {
         'Content-Type': 'application/json',
       },
@@ -73,6 +72,7 @@ class viewquiz extends Component {
           <tbody>{this.state.data.map(function (item, key) {
             return (
               <tr key={key}>
+              
                 <td>{item.id}</td>
                 <td>{item.name}</td>
                 <td>{item.genre}</td>

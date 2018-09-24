@@ -11,6 +11,8 @@ import viewquiz from './viewquiz';
 import ViewPeople from './viewpeople';
 import quizedit from './quizedit';
 import logout from './logout' 
+import attemptquiz from './attemptquiz';
+import playquiz from './playquiz';
 
 
 
@@ -61,7 +63,9 @@ class App extends Component {
                     <li><Link to={'/viewquiz'}>View Quiz</Link></li>
                     <li><Link to={'/viewpeople'}>View People</Link></li>
                     <li><Link to={'/logout'}>Logout</Link></li>
-                    <li><Link to={'/dashboard'}>Dashboard</Link></li>
+                    <li><Link to={'/attemptquiz'}>Attempt Quiz</Link></li>
+
+                    {/* <li><Link to={'/dashboard'}>Dashboard</Link></li> */}
                     </ul>
               </div>
             </nav>
@@ -73,8 +77,11 @@ class App extends Component {
                 <Route exact path='/viewquiz' component={viewquiz}/>
                 <Route exact path='/viewpeople' component={ViewPeople}/>
                 <Route exact path='/quizedit/:id' component={quizedit}/>
+                <Route exact path='/playquiz/:id' component={playquiz}/>
+
                 <Route exact path='/logout' component={logout}/>
-                <Route exact path='/dashboard' component={dashboard}/>
+                <Route exact path='/attemptquiz' component={attemptquiz}/>                
+                {/* <Route exact path='/dashboard' component={dashboard}/> */}
                 
             </Switch>
           </div>

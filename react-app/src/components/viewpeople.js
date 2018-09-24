@@ -8,8 +8,6 @@ class ViewPeople extends Component {
       data: []
     }
   }
-
-  // Lifecycle hook, runs after component has mounted onto the DOM structure
   componentDidMount() {
     const request = new Request('http://localhost:8080/private/people/');
     fetch(request,{
@@ -24,8 +22,24 @@ class ViewPeople extends Component {
   }
 
   render() {
+    function DeleteRow(id) {
+      fetch('http://localhost:8080/private/delperson/', {
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/json',
+
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 'id': id }),
+      })
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            window.location.reload();
+          }
+        });
+    } 
     return (
-      <div className="App">
+    <div className="App">
         <header className="App-header">
           <h1 className="App-title">View All People</h1>
         </header>
@@ -44,7 +58,7 @@ class ViewPeople extends Component {
                       <td>{item.id}</td>
                       <td>{item.firstname}</td>
                       <td>{item.lastname}</td>
-                      <td></td>
+                      <td><button type="button" className="btn btn-default" onClick = {DeleteRow.bind(this,item.id)}>Delete</button></td>
                   </tr>
                 )
              })}

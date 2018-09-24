@@ -31,12 +31,31 @@ class createquiz extends Component {
         this.handleOptionc = this.handleOptionc.bind(this)
         this.handleOptiond = this.handleOptiond.bind(this)
         this.returnQuiz = this.returnQuiz.bind(this)
+        this.handleVChange = this.handleVChange.bind(this)
 
 
     };
     static contextTypes = {
         router: PropTypes.object,
       } 
+    handleVChange (event) {
+        if(event.target.value == "a"){
+            this.state.formData.Vala = !this.state.formData.Vala;
+            console.log(this.state.formData.Vala);
+        }
+        if(event.target.value == "b"){
+            this.state.formData.Valb = !this.state.formData.Valb;
+            console.log(this.state.formData.Valb);
+        }
+        if(event.target.value == "c"){
+            this.state.formData.Valc = !this.state.formData.Valc;
+            console.log(this.state.formData.Valc);
+        }
+        if(event.target.value == "d"){
+            this.state.formData.Vald = !this.state.formData.Vald;
+            console.log(this.state.formData.Vald);
+        }
+    }
     componentDidMount() {
         var id = this.props.match.params.id;
         console.log("id hai "+id);
@@ -79,7 +98,7 @@ class createquiz extends Component {
     handleQues (event) {
         this.state.formData.Ques = event.target.value;
         this.state.formData.Quizid = this.props.match.params.id;
-        console.log("handler")
+        console.log("handler");
     }
 
     handleOptiona (event) {
@@ -137,9 +156,14 @@ class createquiz extends Component {
                         </div>
                             <label>Options</label>
                             <input type="text" className="form-control" value={this.state.Optiona} onChange={this.handleOptiona} />
+                            <input type = "radio" className = "optradio" value="a" checked = {this.state.formData.Vala} onChange={this.handleVChange}/>
                             <input type="text" className="form-control" value={this.state.Optionb} onChange={this.handleOptionb} />
+                            <input type = "radio" className = "optradio" value="b" checked = {this.state.formData.Valb} onChange={this.handleVChange}/>
                             <input type="text" className="form-control" value={this.state.Optionc} onChange={this.handleOptionc} />
+                            <input type = "radio" className = "optradio" value="c" checked = {this.state.formData.Valc} onChange={this.handleVChange}/>
                             <input type="text" className="form-control" value={this.state.Optiond} onChange={this.handleOptiond} />
+                            <input type = "radio" className = "optradio" value="d" checked = {this.state.formData.Vald} onChange={this.handleVChange}/>
+
 
                         <button type="submit" className="btn btn-default">Submit</button>
                         <button type="button" className="btn btn-default" onClick = {this.returnQuiz}>Done Editing</button>

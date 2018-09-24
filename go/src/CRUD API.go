@@ -113,6 +113,7 @@ func main() {
 	private.POST("/delques", DeleteQues)
 	private.POST("/viewques/", ViewQues)
 	private.POST("/delperson/", DeletePerson)
+	private.POST("/getquiz/:id", GetQues)
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:8080"}
 	r.Use((cors.New(config)))
@@ -224,6 +225,23 @@ func ViewQues(c *gin.Context) {
 	// fmt.Println("id=+=", dat["id"])
 	var ques2 []Question
 	db.Where("quizid == ?", dat["id"]).Find(&ques2)
+	c.Header("Content-Type", "application/json")
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+	c.JSON(200, ques2)
+	db.Close()
+}
+
+func GetQues(c *gin.Context) {
+	id := c.Params.ByName("id")
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	// body, err := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(err)
+	// var dat map[string]interface{}
+	// json.Unmarshal(body, &dat)
+	// fmt.Println("id=+=", dat["id"])
+	var ques2 []Question
+	db.Where("quizid == ?", id).Find(&ques2)
 	c.Header("Content-Type", "application/json")
 	c.Header("access-control-allow-origin", "http://localhost:3000")
 	c.Header("access-control-allow-credentials", "true")

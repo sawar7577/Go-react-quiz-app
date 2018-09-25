@@ -9,7 +9,7 @@ import logout from './logout'
 import attemptquiz from './attemptquiz';
 import playquiz from './playquiz';
 import editques from './editques';
-// import leaderboard from './leaderboard';
+import leaderboard from './leaderboard';
 import dashboard from './dashboard';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
@@ -75,7 +75,7 @@ class App extends Component {
                     <li><Link to={'/viewpeople'}>View People</Link></li>
                     <li><Link to={'/logout'}>Logout</Link></li>
                     <li><Link to={'/attemptquiz'}>Attempt Quiz</Link></li>
-                    {/* <li><Link to={'/leaderboard'}>Leaderboard</Link></li> */}
+                    <li><Link to={'/leaderboard'}>Leaderboard</Link></li>
                     <li><Link to={'/dashboard'}>Dashboard</Link></li>                    
                     </ul>
                   }
@@ -93,7 +93,7 @@ class App extends Component {
                 <Route exact path='/logout' component={logout}/>
                 <Route exact path='/attemptquiz' component={attemptquiz}/>
                 <Route exact path='/editques/:id' component={editques}/>                
-                {/* <Route exact path='/leaderboard' component={leaderboard}/>                                 */}
+                <Route exact path='/leaderboard' component={leaderboard}/>                                
                 <Route exact path='/dashboard' component={dashboard}/>                                                
                 
             </Switch>

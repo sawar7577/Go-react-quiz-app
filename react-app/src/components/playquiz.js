@@ -7,15 +7,13 @@ class playquiz extends Component {
     super();
     this.state = {
       name : "",
-      quizname : "",
+      quizdetails : "",
       data: [],
-      index: 0,
-      // formData : { 
+      index: 0, 
         selecta: false,
         selectb: false,
         selectc: false,
         selectd: false,
-    // },
       score : 0,
     }
     this.handleVChange = this.handleVChange.bind(this);
@@ -51,7 +49,7 @@ class playquiz extends Component {
         credentials: 'include',
       })
         .then(response => response.json())
-          .then(data => this.setState({quizname : data }));
+          .then(data => this.setState({quizdetails : data }));
   }
     static contextTypes = {
       router: PropTypes.object,
@@ -89,10 +87,10 @@ class playquiz extends Component {
     }
     if(this.state.data.length == this.state.index+1){
       console.log("request sent",this.state.score);
-      fetch('http://localhost:8080/private/addresult',{
+      fetch('http://localhost:8080/private/addresult/'+this.state.score,{
           method: 'POST',
           credentials: 'include',
-          body: JSON.stringify({"UserName":this.state.name, "Quizid": this.props.match.params.id, "Score": this.state.score, "Quizname": this.state.quizname})
+          body: JSON.stringify({"Score": this.state.score, "UserName":this.state.name, "Quizid": this.props.match.params.id, "Quizname": this.state.quizdetails.name, "Genre": this.state.quizdetails.genre})
       })
         .then(response =>{
             if(response.status >= 200 && response.status<=400){

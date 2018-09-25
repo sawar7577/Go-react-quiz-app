@@ -31,6 +31,7 @@ type Scores struct {
 	UserName string `json:"username"`
 	Quizid   uint   `json:"quizid,string"`
 	Quizname string `json:"quizname"`
+	Genre    string `json:"genre"`
 	Score    uint   `json:"score,string"`
 }
 
@@ -116,7 +117,8 @@ func main() {
 	private.GET("/editques/:id", GetQues)
 	private.POST("/editq", EditQues)
 	private.GET("/getscores/:username", GetScores)
-	private.POST("/addresult", AddScore)
+	private.POST("/getleaderboard", GetBoard)
+	private.POST("/addresult/:score", AddScore)
 	private.GET("/getquizname/:id", GetQuizName)
 
 	config := cors.DefaultConfig()
@@ -124,6 +126,24 @@ func main() {
 	r.Use((cors.New(config)))
 	r.Run(":8080") // Run on port 8080
 
+}
+func GetBoard(c *gin.Context) {
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	body, err := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(err)
+	var str string
+	json.Unmarshal(body, &str)
+	var score Scores
+	score.Genre = str
+	var res []Scores
+	db.Where("genre = ?", score.Genre).Order("score desc").Find(&res)
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+	fmt.Println(res)
+	c.JSON(200, res)
 }
 
 func GetQuizName(c *gin.Context) {
@@ -141,10 +161,13 @@ func GetQuizName(c *gin.Context) {
 
 	c.Header("access-control-allow-origin", "http://localhost:3000")
 	c.Header("access-control-allow-credentials", "true")
-	c.JSON(200, quiz2.Name)
+	c.JSON(200, quiz2)
 }
 
 func AddScore(c *gin.Context) {
+	uscore := c.Params.ByName("score")
+	a, b := strconv.Atoi(uscore)
+	fmt.Println(b)
 	fmt.Println("add score called")
 	db, err = gorm.Open("sqlite3", "./gorm.db")
 	if err != nil {
@@ -153,7 +176,9 @@ func AddScore(c *gin.Context) {
 	var score Scores
 	body, err := ioutil.ReadAll(c.Request.Body)
 	fmt.Println(err)
+	fmt.Println(body)
 	json.Unmarshal(body, &score)
+	score.Score = uint(a)
 	fmt.Println(score)
 	db.Create(&score)
 	c.Header("access-control-allow-origin", "http://localhost:3000")

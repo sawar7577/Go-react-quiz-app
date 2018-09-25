@@ -7,10 +7,11 @@ class attemptquiz  extends Component {
         super();
         this.state = {
             data : [],
-            genre : ""
+            genre : "",
         }
         
         this.handleGChange = this.handleGChange.bind(this);
+        this.showScores = this.showScores.bind(this);
     };
     static contextTypes = {
         router: PropTypes.object,
@@ -20,24 +21,20 @@ class attemptquiz  extends Component {
             genre : event.target.value
         });
       this.state.genre = event.target.value;
-        fetch("http://localhost:8080/private/quizzes/",{
-            method: 'GET',
-            credentials: 'include',
-            header: {
-                'Content-Type': 'application/json',
-              },
-        })
-        .then(response => response.json())
-            .then(data => this.setState({ data: data }));
     }
-    
+    showScores() {
+        fetch('http://localhost:8080/private/getleaderboard',{
+            method: 'POST',
+            body:JSON.stringify(this.state.genre),
+            credentials: 'include',
+        })
+            .then(response => response.json())
+                .then(data => this.setState({data : data}));
+      }
     render() {
         let x = this.context;
         let y = this.state.genre;
-        function showScores(id) {
-            x.router.history.push('/showscores/'+id);
-            fet
-          }
+        
         return (
         <div>
             <div className = "form-group">
@@ -53,26 +50,27 @@ class attemptquiz  extends Component {
                     Marvel
             </label>
             </div>
-            <table className="table-hover">
-            <tbody>{this.state.data.map(function (item, key) {
-            return (
-              <tr key={key}>
-                { item.genre == y &&
-                <td>{item.id}</td> }
-                { item.genre == y &&
-                <td>{item.name}</td>}
-                { item.genre == y &&
-                <td>{item.genre}</td>}
-                { item.genre == y &&
-                <td>{item.type}</td>}
-                { item.genre == y &&
-                <td><button className="btn btn-default" id = {item.id} onClick={showScores.bind(this,item.id)}>Show Leaderboard</button></td>}
-
-              </tr>
-            )
-          })}
+                <button className="btn btn-default" onClick={this.showScores}>Show Leaderboard</button>
+                <table className="table-hover">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Quiz name</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>{this.state.data.map(function(item, key) {
+               return (
+                  <tr key = {key}>
+                      <td>{item.username}</td>
+                      <td>{item.quizname}</td>
+                      <td>{item.score}</td>
+                      {/* <td><button type="button" className="btn btn-default" onClick = {DeleteRow.bind(this,item.id)}>Delete</button></td> */}
+                  </tr>
+                )
+             })}
           </tbody>
-          </table>
+       </table>
         </div>
         );
     }

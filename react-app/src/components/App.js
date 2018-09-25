@@ -1,9 +1,4 @@
 import React, { Component } from 'react';
-// import DeletePerson from './DeletePerson';
-// import ViewPeople from './ViewPeople';
-// import EditPerson from './EditPerson';
-// import NewPerson from './NewPerson';
-// import Home from './Home';
 import signup from './signup';
 import login from './login';
 import createquiz from './createquiz';
@@ -14,34 +9,49 @@ import logout from './logout'
 import attemptquiz from './attemptquiz';
 import playquiz from './playquiz';
 import editques from './editques';
+// import leaderboard from './leaderboard';
+import dashboard from './dashboard';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+// import dashboard from './dashboard';
 
 class App extends Component {
   constructor () {
     super();
     this.state = {
-      authentication : false,
+      // authentication : false,
+      name : 'guest',
     };
   };
-  componentDidMount() {
-    console.log("logged")
-    fetch('http://localhost:8080/logged', {
+  // componentDidMount() {
+  //   console.log("logged")
+  //   fetch('http://localhost:8080/logged', {
+  //       method: 'GET',
+  //       credentials: 'include',
+  //       })
+  //         .then(response => {
+  //           if(response.status >= 200 && response.status < 300){
+  //                       this.setState({authentication: true});
+  //                       console.log("--->",this.state.authentication);
+  //           } else {
+  //             this.setState({authentication: false});
+  //             console.log("--->",this.state.authentication);
+
+  //           }
+  //     });
+  //     console.log("after")
+  // }
+  componentDidMount(){
+    fetch('http://localhost:8080/logged',{
         method: 'GET',
         credentials: 'include',
-        })
-          .then(response => {
-            if(response.status >= 200 && response.status < 300){
-                        this.setState({authentication: true});
-                        console.log("--->",this.state.authentication);
-            } else {
-              this.setState({authentication: false});
-              console.log("--->",this.state.authentication);
-
-            }
-      });
-      console.log("after")
-  }
+    })
+        .then(response => response.json())
+            .then(data => {
+                this.setState({name : data});
+                console.log(this.state.name);
+            });
+    }
   render() {
     return (
       // <div>
@@ -52,23 +62,23 @@ class App extends Component {
                 <div className="navbar-header">
                   <Link className="navbar-brand" to={'/'}>React App</Link>
                 </div>
-                  { !this.state.authentication &&
+                  { this.state.name=='guest' &&
                     <ul className="nav navbar-nav">
                     <li><Link to={'/signup'}>Sign Up</Link></li>
                     <li><Link to={'/login'}>Login</Link></li>
                     </ul>
                   }
-                  { this.state.authentication &&
-                    // <div>
+                  { this.state.name!='guest' &&
                     <ul className="nav navbar-nav">
                     <li><Link to={'/createquiz'}>Create Quiz</Link></li>
                     <li><Link to={'/viewquiz'}>View Quiz</Link></li>
                     <li><Link to={'/viewpeople'}>View People</Link></li>
                     <li><Link to={'/logout'}>Logout</Link></li>
                     <li><Link to={'/attemptquiz'}>Attempt Quiz</Link></li>
+                    {/* <li><Link to={'/leaderboard'}>Leaderboard</Link></li> */}
+                    <li><Link to={'/dashboard'}>Dashboard</Link></li>                    
                     </ul>
                   }
-                    {/* <li><Link to={'/dashboard'}>Dashboard</Link></li> */}
               </div>
             </nav>
             <Switch>
@@ -80,12 +90,11 @@ class App extends Component {
                 <Route exact path='/viewpeople' component={ViewPeople}/>
                 <Route exact path='/quizedit/:id' component={quizedit}/>
                 <Route exact path='/playquiz/:id' component={playquiz}/>
-
                 <Route exact path='/logout' component={logout}/>
                 <Route exact path='/attemptquiz' component={attemptquiz}/>
                 <Route exact path='/editques/:id' component={editques}/>                
-
-                {/* <Route exact path='/dashboard' component={dashboard}/> */}
+                {/* <Route exact path='/leaderboard' component={leaderboard}/>                                 */}
+                <Route exact path='/dashboard' component={dashboard}/>                                                
                 
             </Switch>
           </div>

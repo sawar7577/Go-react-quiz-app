@@ -27,8 +27,8 @@ type Person struct {
 	Password  string `json:"password"`
 }
 
-type Leaderboard struct {
-	ID     uint `json:"id,string"`
+type Scores struct {
+	Username     string `json:"username"`
 	Quizid uint `json:"quizid,string"`
 	Score  uint `json:"score,string"`
 }
@@ -92,7 +92,7 @@ func main() {
 	db.AutoMigrate(&Person{})
 	db.AutoMigrate(&Quiz{})
 	db.AutoMigrate(&Question{})
-	db.AutoMigrate(&Leaderboard{})
+	db.AutoMigrate(&Scores{})
 	fmt.Println("server started")
 
 	r := gin.Default()
@@ -114,11 +114,28 @@ func main() {
 	private.POST("/delperson/", DeletePerson)
 	private.GET("/editques/:id", GetQues)
 	private.POST("/editq", EditQues)
+	private.POST("/getscores",GetScores)
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:8080"}
 	r.Use((cors.New(config)))
 	r.Run(":8080") // Run on port 8080
 
+}
+
+func GetScores(c *gin.Context) {
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	body, err := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(err)
+	var score Scores
+	json.Unmarshal(body, &score)
+	var data []Scores
+	db.Where("quizid = ?", score.Quizid).Find(&data)
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+	c.JSON(200, data)
 }
 
 func EditQues(c *gin.Context) {
@@ -130,7 +147,6 @@ func EditQues(c *gin.Context) {
 	body, err := ioutil.ReadAll(c.Request.Body)
 	fmt.Println(err)
 	json.Unmarshal(body, &ques)
-	// fmt.Println(ques)
 	db.Save(&ques)
 
 	c.Header("access-control-allow-origin", "http://localhost:3000")
@@ -167,11 +183,12 @@ func IsLoggedIn(c *gin.Context) {
 		fmt.Println("not logged in")
 		c.Header("access-control-allow-origin", "http://localhost:3000")
 		c.Header("access-control-allow-credentials", "true")
-		c.JSON(400, false)
+		c.JSON(400, "guest")
 	} else {
 		c.Header("access-control-allow-origin", "http://localhost:3000")
 		c.Header("access-control-allow-credentials", "true")
-		c.JSON(200, true)
+		fmt.Println(session.Values["user"])
+		c.JSON(200, session.Values["user"])
 	}
 }
 

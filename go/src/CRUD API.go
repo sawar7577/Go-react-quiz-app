@@ -28,9 +28,10 @@ type Person struct {
 }
 
 type Scores struct {
-	Username     string `json:"username"`
-	Quizid uint `json:"quizid,string"`
-	Score  uint `json:"score,string"`
+	UserName string `json:"username"`
+	Quizid   uint   `json:"quizid,string"`
+	Quizname string `json:"quizname"`
+	Score    uint   `json:"score,string"`
 }
 
 type Quiz struct {
@@ -114,7 +115,10 @@ func main() {
 	private.POST("/delperson/", DeletePerson)
 	private.GET("/editques/:id", GetQues)
 	private.POST("/editq", EditQues)
-	private.POST("/getscores",GetScores)
+	private.GET("/getscores/:username", GetScores)
+	private.POST("/addresult", AddScore)
+	private.GET("/getquizname/:id", GetQuizName)
+
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:8080"}
 	r.Use((cors.New(config)))
@@ -122,20 +126,56 @@ func main() {
 
 }
 
-func GetScores(c *gin.Context) {
+func GetQuizName(c *gin.Context) {
+	id := c.Params.ByName("id")
 	db, err = gorm.Open("sqlite3", "./gorm.db")
 	if err != nil {
 		fmt.Println(err)
 	}
-	body, err := ioutil.ReadAll(c.Request.Body)
-	fmt.Println(err)
-	var score Scores
-	json.Unmarshal(body, &score)
-	var data []Scores
-	db.Where("quizid = ?", score.Quizid).Find(&data)
+	a, b := strconv.Atoi(id)
+	fmt.Println(b)
+	var quiz Quiz
+	quiz.ID = uint(a)
+	var quiz2 Quiz
+	db.Where("id = ?", quiz.ID).First(&quiz2)
+
 	c.Header("access-control-allow-origin", "http://localhost:3000")
 	c.Header("access-control-allow-credentials", "true")
-	c.JSON(200, data)
+	c.JSON(200, quiz2.Name)
+}
+
+func AddScore(c *gin.Context) {
+	fmt.Println("add score called")
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var score Scores
+	body, err := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(err)
+	json.Unmarshal(body, &score)
+	fmt.Println(score)
+	db.Create(&score)
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+	c.JSON(200, score)
+	// j := body["quizid"]
+}
+
+func GetScores(c *gin.Context) {
+	username := c.Params.ByName("username")
+	var history Scores
+	history.UserName = username
+	var findHistory []Scores
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	db.Where("user_name = ?", history.UserName).Find(&findHistory)
+	// c.Header("Content-Type", "application/json")
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+	c.JSON(200, findHistory)
 }
 
 func EditQues(c *gin.Context) {

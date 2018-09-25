@@ -6,6 +6,8 @@ class playquiz extends Component {
   constructor() {
     super();
     this.state = {
+      name : "",
+      quizname : "",
       data: [],
       index: 0,
       // formData : { 
@@ -33,6 +35,23 @@ class playquiz extends Component {
     })
       .then(response => response.json())
       .then(data => this.setState({ data: data }));
+
+      fetch('http://localhost:8080/logged',{
+        method: 'GET',
+        credentials: 'include',
+        })
+        .then(response => response.json())
+            .then(data => {
+                this.setState({name : data});
+                console.log(this.state.name);
+          });
+
+      fetch('http://localhost:8080/private/getquizname/'+this.props.match.params.id,{
+        method: 'GET',
+        credentials: 'include',
+      })
+        .then(response => response.json())
+          .then(data => this.setState({quizname : data }));
   }
     static contextTypes = {
       router: PropTypes.object,
@@ -64,7 +83,23 @@ class playquiz extends Component {
         }
       }
     }
-      this.setState({index:this.state.index + 1});    
+    if(this.state.data.length > this.state.index){
+      this.setState({index:this.state.index + 1});
+      console.log(this.state.data.length,this.state.index);    
+    }
+    if(this.state.data.length == this.state.index+1){
+      console.log("request sent",this.state.score);
+      fetch('http://localhost:8080/private/addresult',{
+          method: 'POST',
+          credentials: 'include',
+          body: JSON.stringify({"UserName":this.state.name, "Quizid": this.props.match.params.id, "Score": this.state.score, "Quizname": this.state.quizname})
+      })
+        .then(response =>{
+            if(response.status >= 200 && response.status<=400){
+              console.log("done");
+            }
+        });
+    }
   }  
   
   render() {

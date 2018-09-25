@@ -38,7 +38,7 @@ class ViewPeople extends Component {
           <tbody>{this.state.data.map(function(item, key) {
                return (
                   <tr key = {key}>
-                      <td>{item.username}</td>
+                      <td>{item.quizname}</td>
                       <td>{item.score}</td>
                   </tr>
                 )

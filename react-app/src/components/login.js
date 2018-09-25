@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import ReactDOM, { render } from 'react-dom';
-// import { browserHistory } from 'react-router-dom';
-import history from './history';
+import PropTypes from 'prop-types';
+
 class login extends Component {
     constructor() {
         super();
@@ -16,6 +15,9 @@ class login extends Component {
         this.handlePChange = this.handlePChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         };
+        static contextTypes = {
+            router: PropTypes.object,
+          } 
         handleSubmit (event) {
               event.preventDefault();
                 fetch('http://localhost:8080/person/authenticate', {
@@ -30,7 +32,8 @@ class login extends Component {
                     if(response.status >= 200 && response.status < 300){
                         console.log("true")
                         this.setState({authentication: true});
-                        this.onNavigationHome();
+                        this.context.router.history.push('/viewquiz');
+                        window.location.reload();
                     }
                   });
           }
@@ -42,9 +45,9 @@ class login extends Component {
             this.state.formData.Password = event.target.value;
           }
 
-        onNavigationHome () {
-            history.push("/");
-        }
+        // onNavigationHome () {
+            // history.push("/");
+        // }
     render() {
         return (
             <div className = "login">

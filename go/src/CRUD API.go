@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	// "log"
 	"math/rand"
-	// "net/http"
-
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -101,7 +99,7 @@ func main() {
 	r.POST("/person", CreatePerson)
 	r.POST("/person/authenticate", PersonAuthenticate)
 	r.POST("/person/", CheckUsername)
-	r.POST("/logged", IsLoggedIn)
+	r.GET("/logged", IsLoggedIn)
 
 	private := r.Group("/private")
 	private.Use(AuthMiddleware())
@@ -110,15 +108,71 @@ func main() {
 	private.POST("/quiz", CreateQuiz)
 	private.POST("/ques", CreateQues)
 	private.GET("/quizzes/", ViewQuizzes)
+	private.GET("/getquiz/:id", Getquiz)
 	private.POST("/delques", DeleteQues)
 	private.POST("/viewques/", ViewQues)
 	private.POST("/delperson/", DeletePerson)
-	private.POST("/getquiz/:id", GetQues)
+	private.GET("/editques/:id", GetQues)
+	private.POST("/editq", EditQues)
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:8080"}
 	r.Use((cors.New(config)))
 	r.Run(":8080") // Run on port 8080
 
+}
+
+func EditQues(c *gin.Context) {
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var ques Question
+	body, err := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(err)
+	json.Unmarshal(body, &ques)
+	// fmt.Println(ques)
+	db.Save(&ques)
+
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+	c.JSON(200, true)
+}
+
+func GetQues(c *gin.Context) {
+	id := c.Params.ByName("id")
+	db, err = gorm.Open("sqlite3", "./gorm.db")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(id)
+	var ques Question
+	var ques2 Question
+	a, b := strconv.Atoi(id)
+	fmt.Println(b)
+	ques2.ID = uint(a)
+	db.Where("id = ?", ques2.ID).First(&ques)
+	fmt.Println(ques)
+	c.Header("Content-Type", "application/json")
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
+	c.JSON(200, ques)
+}
+
+func IsLoggedIn(c *gin.Context) {
+	session, err := store.Get(c.Request, "session-name")
+	if err != nil {
+		fmt.Println(err)
+	}
+	if session.Values["user"] == nil {
+		fmt.Println("not logged in")
+		c.Header("access-control-allow-origin", "http://localhost:3000")
+		c.Header("access-control-allow-credentials", "true")
+		c.JSON(400, false)
+	} else {
+		c.Header("access-control-allow-origin", "http://localhost:3000")
+		c.Header("access-control-allow-credentials", "true")
+		c.JSON(200, true)
+	}
 }
 
 func Logout(c *gin.Context) {
@@ -232,16 +286,16 @@ func ViewQues(c *gin.Context) {
 	db.Close()
 }
 
-func GetQues(c *gin.Context) {
-	id := c.Params.ByName("id")
+func Getquiz(c *gin.Context) {
+	fmt.Println("get quiz called")
 	db, err = gorm.Open("sqlite3", "./gorm.db")
-	// body, err := ioutil.ReadAll(c.Request.Body)
-	fmt.Println(err)
-	// var dat map[string]interface{}
-	// json.Unmarshal(body, &dat)
-	// fmt.Println("id=+=", dat["id"])
+	var ques Question
+	id := c.Params.ByName("id")
+	var i int
+	i, err = strconv.Atoi(id)
+	ques.Quizid = uint(i)
 	var ques2 []Question
-	db.Where("quizid == ?", id).Find(&ques2)
+	db.Where("quizid == ?", ques.Quizid).Find(&ques2)
 	c.Header("Content-Type", "application/json")
 	c.Header("access-control-allow-origin", "http://localhost:3000")
 	c.Header("access-control-allow-credentials", "true")
@@ -316,28 +370,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Next()
-	}
-}
-
-func IsLoggedIn(c *gin.Context) {
-	fmt.Println("log check")
-	session, err := store.Get(c.Request, "session-name")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(session.Values["user"])
-	if session.Values["user"] == nil {
-		c.Header("access-control-allow-credentials", "true")
-		c.Header("access-control-allow-origin", "http://localhost:3000")
-		c.Header("Content-Type", "application/json")
-
-		c.JSON(404, false)
-	} else {
-		c.Header("access-control-allow-credentials", "true")
-		c.Header("access-control-allow-origin", "http://localhost:3000")
-		c.Header("Content-Type", "application/json")
-
-		c.JSON(200, true)
 	}
 }
 

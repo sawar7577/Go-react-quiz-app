@@ -40,20 +40,21 @@ class createquiz extends Component {
       } 
     handleVChange (event) {
         if(event.target.value == "a"){
+            console.log("----",this.state.formData.Vala,"---",this.state.formData.Vala==true);
+
             this.state.formData.Vala = !this.state.formData.Vala;
-            console.log(this.state.formData.Vala);
         }
         if(event.target.value == "b"){
             this.state.formData.Valb = !this.state.formData.Valb;
-            console.log(this.state.formData.Valb);
+            // console.log(this.state.formData.Valb);
         }
         if(event.target.value == "c"){
             this.state.formData.Valc = !this.state.formData.Valc;
-            console.log(this.state.formData.Valc);
+            // console.log(this.state.formData.Valc);
         }
         if(event.target.value == "d"){
             this.state.formData.Vald = !this.state.formData.Vald;
-            console.log(this.state.formData.Vald);
+            // console.log(this.state.formData.Vald);
         }
     }
     componentDidMount() {
@@ -63,7 +64,7 @@ class createquiz extends Component {
         fetch(request, {
           method: 'POST',
           header: {
-            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/json',
           },
           credentials: 'include',
           body: JSON.stringify({'id': id}),
@@ -111,10 +112,13 @@ class createquiz extends Component {
         this.state.formData.Optionc = event.target.value;
     }
     handleOptiond (event) {
+        // console.log(this.state.formData.Optiond,(this.state.formData.Optiond == true))    
+
         this.state.formData.Optiond = event.target.value;
-        console.log("func "+this.state.formData.Optiond)    
+        // console.log(this.state.formData.Optiond,(this.state.formData.Optiond == true))    
     }
     render () {
+        let y = this.context;
        function deleteRow(id) {
         fetch('http://localhost:8080/private/delques', {
             method: 'POST',
@@ -129,6 +133,9 @@ class createquiz extends Component {
                 window.location.reload();
               }
             });
+       }
+       function editRow(id) {
+            y.router.history.push('/editques/'+id);
        } 
         return (
             <div className = "signup" >
@@ -137,12 +144,14 @@ class createquiz extends Component {
                return (
                   <tr key = {key}>
                       <td>{item.ques}</td>
-                      <td>{item.optiona}</td>
-                      <td>{item.optionb}</td>
-                      <td>{item.optionc}</td>
-                      <td>{item.optiond}</td>
+                      <td background-color = {item.vala == "1" ? "green" : "red"}>{item.optiona}</td>
+                      <td background-color = {item.valb == "1" ? "green" : "red"}>{item.optionb}</td>
+                      <td background-color = {item.valc == "1" ? "green" : "red"}>{item.optionc}</td>
+                      <td background-color = {item.vald == "1" ? "green" : "red"}>{item.optiond}</td>
 
                       <td><button className = "btn btn-default" id={item.id} onClick ={deleteRow.bind(this, item.id)}>Delete</button></td>
+                      <td><button className="btn btn-default" id = {item.id} onClick={editRow.bind(this,item.id)}>Edit</button></td>
+
                   </tr>
                 )
              })}
@@ -156,13 +165,13 @@ class createquiz extends Component {
                         </div>
                             <label>Options</label>
                             <input type="text" className="form-control" value={this.state.Optiona} onChange={this.handleOptiona} />
-                            <input type = "radio" className = "optradio" value="a" checked = {this.state.formData.Vala} onChange={this.handleVChange}/>
+                            <input type = "checkbox" className = "optradio" value="a" checked = {this.state.Vala} onChange={this.handleVChange}/>
                             <input type="text" className="form-control" value={this.state.Optionb} onChange={this.handleOptionb} />
-                            <input type = "radio" className = "optradio" value="b" checked = {this.state.formData.Valb} onChange={this.handleVChange}/>
+                            <input type = "checkbox" className = "optradio" value="b" checked = {this.state.Valb} onChange={this.handleVChange}/>
                             <input type="text" className="form-control" value={this.state.Optionc} onChange={this.handleOptionc} />
-                            <input type = "radio" className = "optradio" value="c" checked = {this.state.formData.Valc} onChange={this.handleVChange}/>
+                            <input type = "checkbox" className = "optradio" value="c" checked = {this.state.Valc} onChange={this.handleVChange}/>
                             <input type="text" className="form-control" value={this.state.Optiond} onChange={this.handleOptiond} />
-                            <input type = "radio" className = "optradio" value="d" checked = {this.state.formData.Vald} onChange={this.handleVChange}/>
+                            <input type = "checkbox" className = "optradio" value="d" checked = {this.state.Vald} onChange={this.handleVChange}/>
 
 
                         <button type="submit" className="btn btn-default">Submit</button>

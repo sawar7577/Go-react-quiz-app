@@ -30,7 +30,6 @@ class viewquiz extends Component {
   render() {
     let y = this.context;
     function EditRow(id) {
-      // event.preventDefault();
       console.log(id)
       console.log('/editquiz/'+id)
       y.router.history.push('/quizedit/'+id);

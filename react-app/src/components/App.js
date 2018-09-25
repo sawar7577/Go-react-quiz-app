@@ -13,8 +13,7 @@ import quizedit from './quizedit';
 import logout from './logout' 
 import attemptquiz from './attemptquiz';
 import playquiz from './playquiz';
-
-
+import editques from './editques';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
@@ -27,22 +26,20 @@ class App extends Component {
   };
   componentDidMount() {
     console.log("logged")
-    // fetch('http://localhost:8080/logged', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type' : 'application/json',
-    //     },
-    //     credentials: 'include',
-    //     body: JSON.stringify(this.state.formData),
-    //     })
-    //       .then(response => {
-    //         if(response.status >= 200 && response.status < 300){
-    //                     console.log("true")
-    //                     this.setState({authentication: true});
-    //         } else {
-    //           this.setState({authentication: false});
-    //         }
-    //   });
+    fetch('http://localhost:8080/logged', {
+        method: 'GET',
+        credentials: 'include',
+        })
+          .then(response => {
+            if(response.status >= 200 && response.status < 300){
+                        this.setState({authentication: true});
+                        console.log("--->",this.state.authentication);
+            } else {
+              this.setState({authentication: false});
+              console.log("--->",this.state.authentication);
+
+            }
+      });
       console.log("after")
   }
   render() {
@@ -55,18 +52,23 @@ class App extends Component {
                 <div className="navbar-header">
                   <Link className="navbar-brand" to={'/'}>React App</Link>
                 </div>
+                  { !this.state.authentication &&
                     <ul className="nav navbar-nav">
                     <li><Link to={'/signup'}>Sign Up</Link></li>
                     <li><Link to={'/login'}>Login</Link></li>
-
+                    </ul>
+                  }
+                  { this.state.authentication &&
+                    // <div>
+                    <ul className="nav navbar-nav">
                     <li><Link to={'/createquiz'}>Create Quiz</Link></li>
                     <li><Link to={'/viewquiz'}>View Quiz</Link></li>
                     <li><Link to={'/viewpeople'}>View People</Link></li>
                     <li><Link to={'/logout'}>Logout</Link></li>
                     <li><Link to={'/attemptquiz'}>Attempt Quiz</Link></li>
-
-                    {/* <li><Link to={'/dashboard'}>Dashboard</Link></li> */}
                     </ul>
+                  }
+                    {/* <li><Link to={'/dashboard'}>Dashboard</Link></li> */}
               </div>
             </nav>
             <Switch>
@@ -80,7 +82,9 @@ class App extends Component {
                 <Route exact path='/playquiz/:id' component={playquiz}/>
 
                 <Route exact path='/logout' component={logout}/>
-                <Route exact path='/attemptquiz' component={attemptquiz}/>                
+                <Route exact path='/attemptquiz' component={attemptquiz}/>
+                <Route exact path='/editques/:id' component={editques}/>                
+
                 {/* <Route exact path='/dashboard' component={dashboard}/> */}
                 
             </Switch>

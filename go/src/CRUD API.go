@@ -184,7 +184,6 @@ func AddScore(c *gin.Context) {
 	c.Header("access-control-allow-origin", "http://localhost:3000")
 	c.Header("access-control-allow-credentials", "true")
 	c.JSON(200, score)
-	// j := body["quizid"]
 }
 
 func GetScores(c *gin.Context) {
@@ -197,7 +196,6 @@ func GetScores(c *gin.Context) {
 		fmt.Println(err)
 	}
 	db.Where("user_name = ?", history.UserName).Find(&findHistory)
-	// c.Header("Content-Type", "application/json")
 	c.Header("access-control-allow-origin", "http://localhost:3000")
 	c.Header("access-control-allow-credentials", "true")
 	c.JSON(200, findHistory)

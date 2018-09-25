@@ -65,7 +65,6 @@ class attemptquiz  extends Component {
                       <td>{item.username}</td>
                       <td>{item.quizname}</td>
                       <td>{item.score}</td>
-                      {/* <td><button type="button" className="btn btn-default" onClick = {DeleteRow.bind(this,item.id)}>Delete</button></td> */}
                   </tr>
                 )
              })}

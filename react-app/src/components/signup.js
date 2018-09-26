@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import ReactDOM, { render } from 'react-dom';
+// import ReactDOM, { render } from 'react-dom';
 import './signup.css';
-
 class signup extends Component {
+
     constructor() {
         super();
         this.state = {
@@ -70,45 +70,29 @@ class signup extends Component {
 
       return (
         <div className = "signup" >
-            <div className = "formContainer">
+            <div className = "form">
                 <form onSubmit={this.handleSubmit}>
-                    <div className = "form-group">
-                        <label>First Name</label>
-                        <input type = "text" className = "form-control" value={this.state.FirstName} onChange={this.handleFChange}/>
-                    </div>
-                    <div className = "form-group">
-                        <label>Last Name</label>
-                        <input type = "text" className = "form-control" value={this.state.LastName} onChange={this.handleLChange}/>
-                    </div>
-                    <div className = "form-group">
-                        <label>User Name</label>
-                        <input type = "text" className = "form-control" value={this.state.UserName} onChange={this.handleUChange}/>
+                        <input type = "text" className = "text" value={this.state.FirstName} placeholder = "Firstname" onChange={this.handleFChange}/>
+                        <input type = "text" className = "text" value={this.state.LastName} placeholder = "Lastname" onChange={this.handleLChange}/>
+                        <input type = "text" className = "text" value={this.state.UserName} placeholder = "Username" onChange={this.handleUChange}/>
                         <div>
                           {
                             this.state.validUsername ? "username is available" : "username is taken"
                           }
                         </div>
-                    </div>
-                    <div className = "form-group">
-                        <label>Password</label>
-                        <input type = "text" className = "form-control" value={this.state.Password} onChange={this.handlePChange}/>
-                    </div>
-                    <button type="submit" className="btn btn-default">Submit</button>
-
-                </form>
-            </div>
-            {this.state.submitted &&
+                        <input type = "password" className = "text w3lpass" value={this.state.Password} placeholder = "Password" onChange={this.handlePChange}/>
+                    <button type="submit">Submit</button>
+                    {this.state.submitted &&
           <div>
-            <h2>
+            <h5>
               New person successfully added.
-            </h2>
-             This has been printed using conditional rendering.
+            </h5>
           </div>
         }
+                </form>
+            </div>
         </div>
          );
     }
   }
-
-// render(<App />, document.getElementById('root'));
 export default signup

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import './signup.css';
 
 class login extends Component {
     constructor() {
@@ -44,35 +45,25 @@ class login extends Component {
           handlePChange(event) {
             this.state.formData.Password = event.target.value;
           }
-
-        // onNavigationHome () {
-            // history.push("/");
-        // }
     render() {
         return (
-            <div className = "login">
-                <div className = "formContainer">
-                    <form onSubmit = {this.handleSubmit}>
-                        <div className = "form-group">
-                            <label>UserName</label>
-                            <input type = "text" className = "form-control" value = {this.state.UserName} onChange = {this.handleUChange}/>
-                        </div>
-                        <div className = "form-group">
-                            <label>Password</label>
-                            <input type = "text" className = "form-control" value = {this.state.Password} onChange = {this.handlePChange}/>
-                        </div>
-                        <button type="submit" className="btn btn-default">Submit</button>
-                    </form>
-                </div>
-                {this.state.authentication &&
+            <div className = "login" >
+            <div className = "form">
+                <form onSubmit={this.handleSubmit}>
+                        <input type = "text" className = "text" value={this.state.UserName} placeholder = "Username" onChange={this.handleUChange}/>
+                        <input type = "password" className = "text w3lpass" value={this.state.Password} placeholder = "Password" onChange={this.handlePChange}/>
+                    <button type="submit">Submit</button>
+                    { !this.state.authentication &&
                     <div>
-                        <h2>
-                        User verified.
-                        </h2>
-                        This has been printed using conditional rendering.
+                        <h5>
+                        Invalid username/password
+                        </h5>
                     </div>
                     }
+                </form>
             </div>
+        </div>
+
         );
     }
 }

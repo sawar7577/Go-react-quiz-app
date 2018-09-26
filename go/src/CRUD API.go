@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -120,10 +119,11 @@ func main() {
 	private.POST("/getleaderboard", GetBoard)
 	private.POST("/addresult/:score", AddScore)
 	private.GET("/getquizname/:id", GetQuizName)
+	private.GET("/logout", Logout)
 
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:8080"}
-	r.Use((cors.New(config)))
+	// config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://localhost:8080"}
+	// r.Use((cors.New(config)))
 	r.Run(":8080") // Run on port 8080
 
 }
@@ -260,6 +260,8 @@ func Logout(c *gin.Context) {
 	fmt.Println(err)
 	session.Options.MaxAge = -1
 	session.Save(c.Request, c.Writer)
+	c.Header("access-control-allow-origin", "http://localhost:3000")
+	c.Header("access-control-allow-credentials", "true")
 	c.JSON(200, "ok")
 }
 
